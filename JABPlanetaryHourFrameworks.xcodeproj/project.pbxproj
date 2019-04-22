@@ -6,11 +6,76 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		B93BC5B4226E5DBC00BB32B7 /* JABPlanetaryHourFramework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = B93BC5B5226E5DBC00BB32B7 /* Build configuration list for PBXAggregateTarget "JABPlanetaryHourFramework" */;
+			buildPhases = (
+			);
+			dependencies = (
+			);
+			name = JABPlanetaryHourFramework;
+			productName = JABPlanetaryHourFramework;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		B93BC4AB226E479C00BB32B7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B93BC4A7226E479B00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B93BC49C226E479B00BB32B7;
+			remoteInfo = JABPlanetaryHourCocoaTouchFramework;
+		};
+		B93BC4E1226E483100BB32B7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B93BC4DD226E483000BB32B7 /* JABPlanetaryHourWatchFramework.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B93BC4D2226E483000BB32B7;
+			remoteInfo = JABPlanetaryHourWatchFramework;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		B93BC4A7226E479B00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JABPlanetaryHourCocoaTouchFramework.xcodeproj; path = JABPlanetaryHourCocoaTouchFramework/JABPlanetaryHourCocoaTouchFramework.xcodeproj; sourceTree = "<group>"; };
+		B93BC4DD226E483000BB32B7 /* JABPlanetaryHourWatchFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JABPlanetaryHourWatchFramework.xcodeproj; path = JABPlanetaryHourWatchFramework/JABPlanetaryHourWatchFramework.xcodeproj; sourceTree = "<group>"; };
+		B93BC59C226E5A4B00BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlanetaryHourDataSource.h; sourceTree = "<group>"; };
+		B93BC5A2226E5AD800BB32B7 /* PlanetaryHourDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlanetaryHourDataSource.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		B93BC487226E470F00BB32B7 = {
 			isa = PBXGroup;
 			children = (
+				B93BC594226E58F600BB32B7 /* Shared */,
+				B93BC4A7226E479B00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.xcodeproj */,
+				B93BC4DD226E483000BB32B7 /* JABPlanetaryHourWatchFramework.xcodeproj */,
 			);
+			sourceTree = "<group>";
+		};
+		B93BC4A8226E479B00BB32B7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B93BC4AC226E479C00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B93BC4DE226E483000BB32B7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B93BC4E2226E483100BB32B7 /* JABPlanetaryHourWatchFramework.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B93BC594226E58F600BB32B7 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				B93BC59C226E5A4B00BB32B7 /* PlanetaryHourDataSource.h */,
+				B93BC5A2226E5AD800BB32B7 /* PlanetaryHourDataSource.m */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -20,6 +85,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1020;
+				TargetAttributes = {
+					B93BC5B4226E5DBC00BB32B7 = {
+						CreatedOnToolsVersion = 10.2;
+					};
+				};
 			};
 			buildConfigurationList = B93BC48B226E470F00BB32B7 /* Build configuration list for PBXProject "JABPlanetaryHourFrameworks" */;
 			compatibilityVersion = "Xcode 9.3";
@@ -30,11 +100,39 @@
 			);
 			mainGroup = B93BC487226E470F00BB32B7;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = B93BC4A8226E479B00BB32B7 /* Products */;
+					ProjectRef = B93BC4A7226E479B00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.xcodeproj */;
+				},
+				{
+					ProductGroup = B93BC4DE226E483000BB32B7 /* Products */;
+					ProjectRef = B93BC4DD226E483000BB32B7 /* JABPlanetaryHourWatchFramework.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
+				B93BC5B4226E5DBC00BB32B7 /* JABPlanetaryHourFramework */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		B93BC4AC226E479C00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = JABPlanetaryHourCocoaTouchFramework.framework;
+			remoteRef = B93BC4AB226E479C00BB32B7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B93BC4E2226E483100BB32B7 /* JABPlanetaryHourWatchFramework.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = JABPlanetaryHourWatchFramework.framework;
+			remoteRef = B93BC4E1226E483100BB32B7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin XCBuildConfiguration section */
 		B93BC48C226E470F00BB32B7 /* Debug */ = {
@@ -49,6 +147,24 @@
 			};
 			name = Release;
 		};
+		B93BC5B6226E5DBC00BB32B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B93BC5B7226E5DBC00BB32B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -57,6 +173,15 @@
 			buildConfigurations = (
 				B93BC48C226E470F00BB32B7 /* Debug */,
 				B93BC48D226E470F00BB32B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B93BC5B5226E5DBC00BB32B7 /* Build configuration list for PBXAggregateTarget "JABPlanetaryHourFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B93BC5B6226E5DBC00BB32B7 /* Debug */,
+				B93BC5B7226E5DBC00BB32B7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
