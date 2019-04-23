@@ -390,7 +390,13 @@ NSAttributedString *(^attributedPlanetSymbol)(NSString *) = ^(NSString *symbol) 
 //    NSLog(@"Dequeuing %@", blk_structure);//, blk_structure->blk(&blk_structure->param));
 //}
 
-- (void)solarCyclesForDays:(NSIndexSet *)days planetaryHourData:(NSIndexSet *)data planetaryHours:(NSIndexSet *)hours solarCycleCompletionBlock:(void (^)(NSDictionary<NSNumber *,NSDate *> * _Nonnull))solarCycleCompletionBlock planetaryHourCompletionBlock:(void (^)(NSDictionary<NSNumber *,id> * _Nonnull))planetaryHourCompletionBlock planetaryHoursCompletionBlock:(void (^)(NSArray<NSDictionary<NSNumber *,NSDate *> *> * _Nonnull))planetaryHoursCompletionBlock planetaryHourDataSourceCompletionBlock:(void (^)(NSError * _Nullable))planetaryHourDataSourceCompletionBlock
+- (void)solarCyclesForDays:(NSIndexSet *)days
+         planetaryHourData:(NSIndexSet *)data
+            planetaryHours:(NSIndexSet *)hours
+ solarCycleCompletionBlock:(void(^)(NSDictionary<NSNumber *, NSDate *> *solarCycle))solarCycleCompletionBlock
+planetaryHourCompletionBlock:(void (^)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
+planetaryHoursCompletionBlock:(void(^)(NSArray<NSDictionary<NSNumber *, NSDate *> *> *planetaryHours))planetaryHoursCompletionBlock
+planetaryHourDataSourceCompletionBlock:(void (^)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
 {
     ^void (void(^solarCycleCompletionBlock)(NSDictionary<NSNumber *, NSDate *> *), NSDate * _Nullable date, CLLocation * _Nullable location, int (^ _Nonnull solarCycleDataProviderDate)(NSDate * _Nonnull), CLLocationCoordinate2D (^ _Nonnull solarCycleDataProviderLocation)(CLLocation * _Nullable), NSDate *(^dateFromJulianDayNumber)(double), NSDictionary<NSNumber *,NSDate *> * _Nonnull (^ _Nonnull solarCycleDataProvider)(int, CLLocationCoordinate2D, NSDate *(^)(double)))
     {
@@ -504,8 +510,9 @@ NSAttributedString *(^attributedPlanetSymbol)(NSString *) = ^(NSString *symbol) 
                             if (currentIndex != NSNotFound)
                             {
                                 solarCycleDates(outgoingTwilightDates);
+                                planetaryHoursCompletionBlock(planetaryHoursData);
                             } else {
-                                planetaryHourDataSourceCompletionBlock(planetaryHoursData);
+                                planetaryHourDataSourceCompletionBlock(nil);
                             }
                         });
                     }

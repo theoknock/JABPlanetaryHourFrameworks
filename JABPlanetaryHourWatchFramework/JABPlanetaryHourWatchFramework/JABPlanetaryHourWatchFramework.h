@@ -16,3 +16,4 @@ FOUNDATION_EXPORT const unsigned char JABPlanetaryHourWatchFrameworkVersionStrin
 
 // In this header, you should import all the public headers of your framework using statements like #import <JABPlanetaryHourWatchFramework/PublicHeader.h>
 
+#import "PlanetaryHourDataSource.h"

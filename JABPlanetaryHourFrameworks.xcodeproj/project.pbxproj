@@ -39,8 +39,8 @@
 /* Begin PBXFileReference section */
 		B93BC4A7226E479B00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JABPlanetaryHourCocoaTouchFramework.xcodeproj; path = JABPlanetaryHourCocoaTouchFramework/JABPlanetaryHourCocoaTouchFramework.xcodeproj; sourceTree = "<group>"; };
 		B93BC4DD226E483000BB32B7 /* JABPlanetaryHourWatchFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JABPlanetaryHourWatchFramework.xcodeproj; path = JABPlanetaryHourWatchFramework/JABPlanetaryHourWatchFramework.xcodeproj; sourceTree = "<group>"; };
-		B93BC59C226E5A4B00BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlanetaryHourDataSource.h; sourceTree = "<group>"; };
-		B93BC5A2226E5AD800BB32B7 /* PlanetaryHourDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlanetaryHourDataSource.m; sourceTree = "<group>"; };
+		B93BC59C226E5A4B00BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlanetaryHourDataSource.h; sourceTree = "<group>"; wrapsLines = 0; };
+		B93BC5A2226E5AD800BB32B7 /* PlanetaryHourDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlanetaryHourDataSource.m; sourceTree = "<group>"; wrapsLines = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */

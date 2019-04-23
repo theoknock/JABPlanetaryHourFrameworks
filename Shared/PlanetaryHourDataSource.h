@@ -99,6 +99,8 @@ planetaryHourDataSourceCompletionBlock:(void (^)(NSError * __nullable error))pla
 @property (strong, nonatomic) NSString *(^planetSymbolForPlanet)(Planet planet);
 @property (strong, nonatomic) UIColor *(^colorForPlanetSymbol)(NSString *planetarySymbol);
 
+- (UIImage * _Nonnull (^)(NSString * _Nonnull, UIColor * _Nullable, CGFloat))imageFromText;
+
 @end
 
 NS_ASSUME_NONNULL_END
