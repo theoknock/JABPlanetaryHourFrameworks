@@ -10,6 +10,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
 #import <EventKit/EventKit.h>
+//#import <CoreMedia/CoreMedia.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -90,10 +91,10 @@ typedef NS_ENUM(NSUInteger, PlanetaryHour) {
 - (void)solarCyclesForDays:(NSIndexSet *)days
          planetaryHourData:(NSIndexSet *)data
             planetaryHours:(NSIndexSet *)hours
- solarCycleCompletionBlock:(void(^)(NSDictionary<NSNumber *, NSDate *> *solarCycle))solarCycleCompletionBlock
-planetaryHourCompletionBlock:(void (^)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
-planetaryHoursCompletionBlock:(void(^)(NSArray<NSDictionary<NSNumber *, NSDate *> *> *planetaryHours))planetaryHoursCompletionBlock
-planetaryHourDataSourceCompletionBlock:(void (^)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
+             solarCycleCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, NSDate *> * _Nonnull solarCycle))solarCycleCompletionBlock
+          planetaryHourCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
+         planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *, id> *> * _Nonnull planetaryHours))planetaryHoursCompletionBlock
+planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
 
 @property (strong, nonatomic) Planet (^planetForPlanetSymbol)(NSString *planetarySymbol);
 @property (strong, nonatomic) NSString *(^planetSymbolForPlanet)(Planet planet);

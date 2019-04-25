@@ -79,17 +79,31 @@ static PlanetaryHourDataSource *data = NULL;
     if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted)
     {
         NSLog(@"Failure to authorize location services\t%d", status);
-        [manager stopUpdatingLocation];
+        [manager requestLocation];
     }
     else
     {
-        [manager startUpdatingLocation];
+        void (^validateLocation)(void);
+        validateLocation = ^(void) {
+            if ((manager.location.coordinate.latitude  == 0.0  ||
+                 manager.location.coordinate.longitude == 0.0) ||
+                !CLLocationCoordinate2DIsValid(manager.location.coordinate))
+            {
+                dispatch_async(dispatch_get_main_queue(), validateLocation);
+            } else {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"PlanetaryHoursDataSourceUpdatedNotification"
+                                                                    object:manager.location
+                                                                  userInfo:nil];
+            }
+        };
+        
+        dispatch_async(dispatch_get_main_queue(), validateLocation);
     }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
-    
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 #pragma mark - Planetary hour calculation definitions and enumerations
@@ -333,6 +347,32 @@ NSAttributedString *(^attributedPlanetSymbol)(NSString *) = ^(NSString *symbol) 
     };
 };
 
+- (UIImage * _Nonnull (^)(NSString * _Nonnull, UIColor * _Nullable, CGFloat))imageFromText
+{
+    return ^(NSString *text, UIColor *color, CGFloat fontsize)
+    {
+        NSMutableParagraphStyle *centerAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+        centerAlignedParagraphStyle.alignment                = NSTextAlignmentCenter;
+        NSDictionary *centerAlignedTextAttributes            = @{NSForegroundColorAttributeName : (!color) ? [UIColor redColor] : color,
+                                                                 NSParagraphStyleAttributeName  : centerAlignedParagraphStyle,
+                                                                 NSFontAttributeName            : [UIFont systemFontOfSize:fontsize weight:UIFontWeightBlack],
+                                                                 NSStrokeColorAttributeName     : [UIColor blackColor],
+                                                                 NSStrokeWidthAttributeName     : [NSNumber numberWithFloat:-2.0]
+                                                                 };
+        
+        CGSize textSize = [text sizeWithAttributes:centerAlignedTextAttributes];
+        UIGraphicsBeginImageContextWithOptions(textSize, NO, 0);
+        [text drawAtPoint:CGPointZero withAttributes:centerAlignedTextAttributes];
+        
+        CGContextSetShouldAntialias(UIGraphicsGetCurrentContext(), YES);
+        CGContextSetShadow(UIGraphicsGetCurrentContext(), CGSizeZero, fontsize);
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        return image;
+    };
+}
+
 //struct block_struct {
 //    void *block;
 //    int param1;
@@ -393,227 +433,239 @@ NSAttributedString *(^attributedPlanetSymbol)(NSString *) = ^(NSString *symbol) 
 - (void)solarCyclesForDays:(NSIndexSet *)days
          planetaryHourData:(NSIndexSet *)data
             planetaryHours:(NSIndexSet *)hours
- solarCycleCompletionBlock:(void(^)(NSDictionary<NSNumber *, NSDate *> *solarCycle))solarCycleCompletionBlock
-planetaryHourCompletionBlock:(void (^)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
-planetaryHoursCompletionBlock:(void(^)(NSArray<NSDictionary<NSNumber *, NSDate *> *> *planetaryHours))planetaryHoursCompletionBlock
-planetaryHourDataSourceCompletionBlock:(void (^)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
+             solarCycleCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, NSDate *> * _Nonnull solarCycle))solarCycleCompletionBlock
+          planetaryHourCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
+         planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *, id> *> * _Nonnull planetaryHours))planetaryHoursCompletionBlock
+planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
 {
-    ^void (void(^solarCycleCompletionBlock)(NSDictionary<NSNumber *, NSDate *> *), NSDate * _Nullable date, CLLocation * _Nullable location, int (^ _Nonnull solarCycleDataProviderDate)(NSDate * _Nonnull), CLLocationCoordinate2D (^ _Nonnull solarCycleDataProviderLocation)(CLLocation * _Nullable), NSDate *(^dateFromJulianDayNumber)(double), NSDictionary<NSNumber *,NSDate *> * _Nonnull (^ _Nonnull solarCycleDataProvider)(int, CLLocationCoordinate2D, NSDate *(^)(double)))
-    {
-        __block void(^solarCycleDates)(NSDictionary<NSNumber *, NSDate *> *);
-        __block NSUInteger currentIndex = days.firstIndex;
-        solarCycleDates = ^(NSDictionary<NSNumber *, NSDate *> *incomingTwilightDates)
+//    typedef void (^ExecutionTimeMeasurement)(CMTime elapsedTime);
+//    typedef void(^MeasureExecutionTime)(ExecutionTimeMeasurement executionTime);
+//    void(^measureExecutionTime)(CMTime, ExecutionTimeMeasurement) = ^(CMTime start, ExecutionTimeMeasurement executionTime)
+//    {
+        ^void (void(^solarCycleCompletionBlock)(NSDictionary<NSNumber *, NSDate *> *), NSDate * _Nullable date, CLLocation * _Nullable location, int (^ _Nonnull solarCycleDataProviderDate)(NSDate * _Nonnull), CLLocationCoordinate2D (^ _Nonnull solarCycleDataProviderLocation)(CLLocation * _Nullable), NSDate *(^dateFromJulianDayNumber)(double), NSDictionary<NSNumber *,NSDate *> * _Nonnull (^ _Nonnull solarCycleDataProvider)(int, CLLocationCoordinate2D, NSDate *(^)(double)))
         {
-            //            dispatch_source_merge_data(self->_block_queue_event, 1);
-            NSDictionary<NSNumber *, NSDate *> *outgoingTwilightDates = solarCycleDataProvider(solarCycleDataProviderDate([[incomingTwilightDates objectForKey:@(TwilightDateSunset)] dateByAddingTimeInterval:AVERAGE_SECONDS_PER_DAY]), solarCycleDataProviderLocation(location), dateFromJulianDayNumber);
-            NSMutableArray<NSDate *> *allDates = [NSMutableArray arrayWithArray:[outgoingTwilightDates allValues]];
-            [allDates addObjectsFromArray:[incomingTwilightDates allValues]];
-            NSDictionary<NSNumber *, NSDate *> * solarCycle = [NSDictionary dictionaryWithObjects:[[allDates sortedArrayWithOptions:NSSortConcurrent
-                                                                                                                    usingComparator:^NSComparisonResult(id obj1, id obj2) {
-                                                                                                                        return (NSComparisonResult)([[(NSDate *)obj1 earlierDate:(NSDate *)obj2] isEqual:(NSDate *)obj1])
-                                                                                                                        ? (NSComparisonResult)NSOrderedAscending
-                                                                                                                        : (NSComparisonResult)NSOrderedDescending;
-                                                                                                                    }]
-                                                                                                   subarrayWithRange:NSMakeRange(0, 3)]
-                                                                                          forKeys:(NSArray<id<NSCopying>> *)@[@(SolarCycleDateStart),
-                                                                                                                              @(SolarCycleDateMid),
-                                                                                                                              @(SolarCycleDateEnd)]];
-            
-            
-            //            solarCycleCompletionBlock(solarCycle);
-            
-            __block NSMutableArray *planetaryHoursData = [[NSMutableArray alloc] initWithCapacity:hours.count];
-            
-            __block void(^calculatePlanetaryHourData)(NSDictionary<NSNumber *, NSDate *> *);
-            __block NSUInteger currentHour = hours.firstIndex;
-            calculatePlanetaryHourData = ^(NSDictionary<NSNumber *, NSDate *> *solarCycleData)
+            __block void(^solarCycleDates)(NSDictionary<NSNumber *, NSDate *> *);
+            __block NSUInteger currentIndex = days.firstIndex;
+            solarCycleDates = ^(NSDictionary<NSNumber *, NSDate *> *incomingTwilightDates)
             {
-                NSTimeInterval transitDuration    = [(currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateMid)] : [solarCycleData objectForKey:@(SolarCycleDateEnd)] timeIntervalSinceDate:(currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateStart)] : [solarCycleData objectForKey:@(SolarCycleDateMid)]];
-                NSTimeInterval hourDuration       = (transitDuration / 12);
-                NSInteger mod_hour                = currentHour % 12;
-                NSTimeInterval startTimeInterval  = hourDuration * mod_hour;
-                NSDate *sinceDate                 = (currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateStart)] : [solarCycleData objectForKey:@(SolarCycleDateMid)];
-                NSDate *startTime                 = [[NSDate alloc] initWithTimeInterval:startTimeInterval sinceDate:sinceDate];
-                NSTimeInterval endTimeInterval    = hourDuration * (mod_hour + 1);
-                NSDate *endTime                   = [[NSDate alloc] initWithTimeInterval:endTimeInterval sinceDate:sinceDate];
+                //            dispatch_source_merge_data(self->_block_queue_event, 1);
+                NSDictionary<NSNumber *, NSDate *> *outgoingTwilightDates = solarCycleDataProvider(solarCycleDataProviderDate([[incomingTwilightDates objectForKey:@(TwilightDateSunset)] dateByAddingTimeInterval:AVERAGE_SECONDS_PER_DAY]), solarCycleDataProviderLocation(location), dateFromJulianDayNumber);
+                NSMutableArray<NSDate *> *allDates = [NSMutableArray arrayWithArray:[outgoingTwilightDates allValues]];
+                [allDates addObjectsFromArray:[incomingTwilightDates allValues]];
+                NSDictionary<NSNumber *, NSDate *> * solarCycle = [NSDictionary dictionaryWithObjects:[[allDates sortedArrayWithOptions:NSSortConcurrent
+                                                                                                                        usingComparator:^NSComparisonResult(id obj1, id obj2) {
+                                                                                                                            return (NSComparisonResult)([[(NSDate *)obj1 earlierDate:(NSDate *)obj2] isEqual:(NSDate *)obj1])
+                                                                                                                            ? (NSComparisonResult)NSOrderedAscending
+                                                                                                                            : (NSComparisonResult)NSOrderedDescending;
+                                                                                                                        }]
+                                                                                                       subarrayWithRange:NSMakeRange(0, 3)]
+                                                                                              forKeys:(NSArray<id<NSCopying>> *)@[@(SolarCycleDateStart),
+                                                                                                                                  @(SolarCycleDateMid),
+                                                                                                                                  @(SolarCycleDateEnd)]];
                 
-                // time
-                NSTimeInterval seconds_in_day        = [[solarCycleData objectForKey:@(SolarCycleDateMid)] timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateStart)]];
-                NSTimeInterval seconds_in_night      = [[solarCycleData objectForKey:@(SolarCycleDateEnd)] timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateMid)]];
-                NSTimeInterval seconds_per_day       = seconds_in_day + seconds_in_night;
-                // distance
-                double map_points_per_second         = MKMapSizeWorld.width / seconds_per_day;
-                double meters_per_second             = MKMetersPerMapPointAtLatitude(location.coordinate.latitude) * map_points_per_second;
-                double meters_per_day                = seconds_in_day   * meters_per_second;
-                double meters_per_night              = seconds_in_night * meters_per_second;
                 
-                double meters_per_day_hour           = meters_per_day   / HOURS_PER_SOLAR_TRANSIT;
-                double meters_per_night_hour         = meters_per_night / HOURS_PER_SOLAR_TRANSIT;
+                if (solarCycleCompletionBlock != nil) {
+                    solarCycleCompletionBlock(solarCycle);
+                }
                 
-                NSTimeInterval timeOffset            = [date timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateStart)]];
+                __block NSMutableArray *planetaryHoursData = [[NSMutableArray alloc] initWithCapacity:hours.count];
                 
-                NSAttributedString *symbol        = attributedPlanetSymbol(planetSymbolForHour([solarCycleData objectForKey:@(SolarCycleDateStart)], currentHour));
-                NSString *name                    = planetNameForHour([solarCycleData objectForKey:@(SolarCycleDateStart)], currentHour);
-                NSString *abbr                    = planetAbbreviatedNameForPlanet(name);
-                UIColor *color                    = PlanetaryHourDataSource.data.colorForPlanetSymbol([symbol string]);
-                CLLocation *coordinate            = PlanetaryHourDataSource.data.locatePlanetaryHour(location, date, meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset, currentHour);
-                NSMutableDictionary * planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:data.count];
-                [data enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-                    switch (idx) {
-                        case StartDate:
-                            [planetaryHourData setObject:startTime forKey:@(StartDate)];
-                            break;
-                        case EndDate:
-                            [planetaryHourData setObject:endTime forKey:@(EndDate)];
-                            break;
-                            
-                        case Symbol:
-                            [planetaryHourData setObject:symbol forKey:@(Symbol)];
-                            break;
-                            
-                        case Name:
-                            [planetaryHourData setObject:name forKey:@(Name)];
-                            break;
-                            
-                        case Abbreviation:
-                            [planetaryHourData setObject:abbr forKey:@(Abbreviation)];
-                            break;
-                            
-                        case Color:
-                            [planetaryHourData setObject:color forKey:@(Color)];
-                            break;
-                            
-                        case Hour:
-                            [planetaryHourData setObject:[NSNumber numberWithInteger:currentHour] forKey:@(Hour)];
-                            break;
-                            
-                        case Coordinate:
-                            [planetaryHourData setObject:coordinate forKey:@(Coordinate)];
-                            break;
-                            
-                        default:
-                            break;
-                    }
-                }];
+                __block void(^calculatePlanetaryHourData)(NSDictionary<NSNumber *, NSDate *> *);
+                __block NSUInteger currentHour = hours.firstIndex;
+                calculatePlanetaryHourData = ^(NSDictionary<NSNumber *, NSDate *> *solarCycleData)
+                {
+                    NSTimeInterval transitDuration    = [(currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateMid)] : [solarCycleData objectForKey:@(SolarCycleDateEnd)] timeIntervalSinceDate:(currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateStart)] : [solarCycleData objectForKey:@(SolarCycleDateMid)]];
+                    NSTimeInterval hourDuration       = (transitDuration / 12);
+                    NSInteger mod_hour                = currentHour % 12;
+                    NSTimeInterval startTimeInterval  = hourDuration * mod_hour;
+                    NSDate *sinceDate                 = (currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateStart)] : [solarCycleData objectForKey:@(SolarCycleDateMid)];
+                    NSDate *startTime                 = [[NSDate alloc] initWithTimeInterval:startTimeInterval sinceDate:sinceDate];
+                    NSTimeInterval endTimeInterval    = hourDuration * (mod_hour + 1);
+                    NSDate *endTime                   = [[NSDate alloc] initWithTimeInterval:endTimeInterval sinceDate:sinceDate];
+                    
+                    // time
+                    NSTimeInterval seconds_in_day        = [[solarCycleData objectForKey:@(SolarCycleDateMid)] timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateStart)]];
+                    NSTimeInterval seconds_in_night      = [[solarCycleData objectForKey:@(SolarCycleDateEnd)] timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateMid)]];
+                    NSTimeInterval seconds_per_day       = seconds_in_day + seconds_in_night;
+                    // distance
+                    double map_points_per_second         = MKMapSizeWorld.width / seconds_per_day;
+                    double meters_per_second             = MKMetersPerMapPointAtLatitude(location.coordinate.latitude) * map_points_per_second;
+                    double meters_per_day                = seconds_in_day   * meters_per_second;
+                    double meters_per_night              = seconds_in_night * meters_per_second;
+                    
+                    double meters_per_day_hour           = meters_per_day   / HOURS_PER_SOLAR_TRANSIT;
+                    double meters_per_night_hour         = meters_per_night / HOURS_PER_SOLAR_TRANSIT;
+                    
+                    NSTimeInterval timeOffset            = [date timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateStart)]];
+                    
+                    NSAttributedString *symbol        = attributedPlanetSymbol(planetSymbolForHour([solarCycleData objectForKey:@(SolarCycleDateStart)], currentHour));
+                    NSString *name                    = planetNameForHour([solarCycleData objectForKey:@(SolarCycleDateStart)], currentHour);
+                    NSString *abbr                    = planetAbbreviatedNameForPlanet(name);
+                    UIColor *color                    = PlanetaryHourDataSource.data.colorForPlanetSymbol([symbol string]);
+                    CLLocation *coordinate            = PlanetaryHourDataSource.data.locatePlanetaryHour(location, date, meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset, currentHour);
+                    NSMutableDictionary * planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:data.count];
+                    [data enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+                        switch (idx) {
+                            case StartDate:
+                                [planetaryHourData setObject:startTime forKey:@(StartDate)];
+                                break;
+                            case EndDate:
+                                [planetaryHourData setObject:endTime forKey:@(EndDate)];
+                                break;
+                                
+                            case Symbol:
+                                [planetaryHourData setObject:symbol forKey:@(Symbol)];
+                                break;
+                                
+                            case Name:
+                                [planetaryHourData setObject:name forKey:@(Name)];
+                                break;
+                                
+                            case Abbreviation:
+                                [planetaryHourData setObject:abbr forKey:@(Abbreviation)];
+                                break;
+                                
+                            case Color:
+                                [planetaryHourData setObject:color forKey:@(Color)];
+                                break;
+                                
+                            case Hour:
+                                [planetaryHourData setObject:[NSNumber numberWithInteger:currentHour] forKey:@(Hour)];
+                                break;
+                                
+                            case Coordinate:
+                                [planetaryHourData setObject:coordinate forKey:@(Coordinate)];
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                    }];
+                    
+                    [planetaryHoursData addObject:planetaryHourData];
+                    if (planetaryHourCompletionBlock != nil) planetaryHourCompletionBlock(planetaryHourData);
+                    
+                    dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
+                        currentHour = [hours indexGreaterThanIndex:currentHour];
+                        if (currentHour != NSNotFound)
+                        {
+                            calculatePlanetaryHourData(solarCycleData);
+                        } else {
+                            dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
+                                currentIndex = [days indexGreaterThanIndex:currentIndex];
+                                if (currentIndex != NSNotFound)
+                                {
+                                    solarCycleDates(outgoingTwilightDates);
+                                    if (planetaryHoursCompletionBlock != nil) planetaryHoursCompletionBlock(planetaryHoursData);
+                                } else {
+//                                    executionTime(CMTimeSubtract(CMClockGetTime(CMClockGetHostTimeClock()), start));
+                                    if (planetaryHourDataSourceCompletionBlock != nil) planetaryHourDataSourceCompletionBlock(nil);
+                                }
+                            });
+                        }
+                    });
+                }; calculatePlanetaryHourData(solarCycle);
                 
-                [planetaryHoursData addObject:planetaryHourData];
-                planetaryHourCompletionBlock(planetaryHourData);
-                
-                dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
-                    currentHour = [hours indexGreaterThanIndex:currentHour];
-                    if (currentHour != NSNotFound)
-                    {
-                        calculatePlanetaryHourData(solarCycleData);
-                    } else {
-                        dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
-                            currentIndex = [days indexGreaterThanIndex:currentIndex];
-                            if (currentIndex != NSNotFound)
-                            {
-                                solarCycleDates(outgoingTwilightDates);
-                                planetaryHoursCompletionBlock(planetaryHoursData);
-                            } else {
-                                planetaryHourDataSourceCompletionBlock(nil);
-                            }
-                        });
-                    }
-                });
-            }; calculatePlanetaryHourData(solarCycle);
-            
-        }; solarCycleDates(solarCycleDataProvider(solarCycleDataProviderDate(date), solarCycleDataProviderLocation(location), dateFromJulianDayNumber));
-    } (solarCycleCompletionBlock,
-       [NSDate date], _locationManager.location,
-       ^int (NSDate * _Nonnull date)
-       {
-           NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-           NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay fromDate:date];
-           int Y = components.year;
-           int M = components.month;
-           int D = components.day;
-           int julianDayNumber = (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 - 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075;
-           
-           return julianDayNumber;
-       },
-       ^CLLocationCoordinate2D (CLLocation * _Nonnull location)
-       {
-           return location.coordinate;
-       },
-       ^NSDate *(double julianDayValue)
-       {
-           int JulianDayNumber = (int)floor(julianDayValue);
-           int J = floor(JulianDayNumber + 0.5);
-           int j = J + 32044;
-           int g = j / 146097;
-           int dg = j - (j/146097) * 146097;
-           int c = (dg / 36524 + 1) * 3 / 4;
-           int dc = dg - c * 36524;
-           int b = dc / 1461;
-           int db = dc - (dc/1461) * 1461;
-           int a = (db / 365 + 1) * 3 / 4;
-           int da = db - a * 365;
-           int y = g * 400 + c * 100 + b * 4 + a;
-           int m = (da * 5 + 308) / 153 - 2;
-           int d = da - (m + 4) * 153 / 5 + 122;
-           NSDateComponents *components = [NSDateComponents new];
-           components.timeZone = [NSTimeZone timeZoneWithName:@"GMT"];
-           components.year = y - 4800 + (m + 2) / 12;
-           components.month = ((m+2) - ((m+2)/12) * 12) + 1;
-           components.day = d + 1;
-           double timeValue = ((julianDayValue - floor(julianDayValue)) + 0.5) * 24;
-           components.hour = (int)floor(timeValue);
-           double minutes = (timeValue - floor(timeValue)) * 60;
-           components.minute = (int)floor(minutes);
-           components.second = (int)((minutes - floor(minutes)) * 60);
-           NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-           NSDate *returnDate = [calendar dateFromComponents:components];
-           
-           return returnDate;
-       },
-       ^NSDictionary<NSNumber *,NSDate *> * _Nonnull (int julianDayNumber, CLLocationCoordinate2D coordinate, NSDate *(^dateFromJulianDayNumber)(double))
-       {
-           double JanuaryFirst2000JDN = 2451545.0;
-           double westLongitude = coordinate.longitude * -1.0;
-           
-           __block double Nearest = 0.0;
-           __block double ElipticalLongitudeOfSun = 0.0;
-           __block double ElipticalLongitudeRadians = ElipticalLongitudeOfSun * toRadians;
-           __block double MeanAnomoly = 0.0;
-           __block double MeanAnomolyRadians = MeanAnomoly * toRadians;
-           __block double MAprev = -1.0;
-           __block double Jtransit = 0.0;
-           
-           while (MeanAnomoly != MAprev)
+            }; solarCycleDates(solarCycleDataProvider(solarCycleDataProviderDate(date), solarCycleDataProviderLocation(location), dateFromJulianDayNumber));
+        } (solarCycleCompletionBlock,
+           [NSDate date], self->_locationManager.location,
+           ^int (NSDate * _Nonnull date)
            {
-               MAprev = MeanAnomoly;
-               Nearest = round(((double)julianDayNumber - JanuaryFirst2000JDN - 0.0009) - (westLongitude/360.0));
-               double Japprox = JanuaryFirst2000JDN + 0.0009 + (westLongitude/360.0) + Nearest;
-               if (Jtransit != 0.0) {
-                   Japprox = Jtransit;
+               NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+               NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay fromDate:date];
+               int Y = components.year;
+               int M = components.month;
+               int D = components.day;
+               int julianDayNumber = (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 - 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075;
+               
+               return julianDayNumber;
+           },
+           ^CLLocationCoordinate2D (CLLocation * _Nonnull location)
+           {
+               return location.coordinate;
+           },
+           ^NSDate *(double julianDayValue)
+           {
+               int JulianDayNumber = (int)floor(julianDayValue);
+               int J = floor(JulianDayNumber + 0.5);
+               int j = J + 32044;
+               int g = j / 146097;
+               int dg = j - (j/146097) * 146097;
+               int c = (dg / 36524 + 1) * 3 / 4;
+               int dc = dg - c * 36524;
+               int b = dc / 1461;
+               int db = dc - (dc/1461) * 1461;
+               int a = (db / 365 + 1) * 3 / 4;
+               int da = db - a * 365;
+               int y = g * 400 + c * 100 + b * 4 + a;
+               int m = (da * 5 + 308) / 153 - 2;
+               int d = da - (m + 4) * 153 / 5 + 122;
+               NSDateComponents *components = [NSDateComponents new];
+               components.timeZone = [NSTimeZone timeZoneWithName:@"GMT"];
+               components.year = y - 4800 + (m + 2) / 12;
+               components.month = ((m+2) - ((m+2)/12) * 12) + 1;
+               components.day = d + 1;
+               double timeValue = ((julianDayValue - floor(julianDayValue)) + 0.5) * 24;
+               components.hour = (int)floor(timeValue);
+               double minutes = (timeValue - floor(timeValue)) * 60;
+               components.minute = (int)floor(minutes);
+               components.second = (int)((minutes - floor(minutes)) * 60);
+               NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+               NSDate *returnDate = [calendar dateFromComponents:components];
+               
+               return returnDate;
+           },
+           ^NSDictionary<NSNumber *,NSDate *> * _Nonnull (int julianDayNumber, CLLocationCoordinate2D coordinate, NSDate *(^dateFromJulianDayNumber)(double))
+           {
+               double JanuaryFirst2000JDN = 2451545.0;
+               double westLongitude = coordinate.longitude * -1.0;
+               
+               __block double Nearest = 0.0;
+               __block double ElipticalLongitudeOfSun = 0.0;
+               __block double ElipticalLongitudeRadians = ElipticalLongitudeOfSun * toRadians;
+               __block double MeanAnomoly = 0.0;
+               __block double MeanAnomolyRadians = MeanAnomoly * toRadians;
+               __block double MAprev = -1.0;
+               __block double Jtransit = 0.0;
+               
+               while (MeanAnomoly != MAprev)
+               {
+                   MAprev = MeanAnomoly;
+                   Nearest = round(((double)julianDayNumber - JanuaryFirst2000JDN - 0.0009) - (westLongitude/360.0));
+                   double Japprox = JanuaryFirst2000JDN + 0.0009 + (westLongitude/360.0) + Nearest;
+                   if (Jtransit != 0.0) {
+                       Japprox = Jtransit;
+                   }
+                   double Ms = (357.5291 + 0.98560028 * (Japprox - JanuaryFirst2000JDN));
+                   MeanAnomoly = fmod(Ms, 360.0);
+                   MeanAnomolyRadians = MeanAnomoly * toRadians;
+                   double EquationOfCenter = (1.9148 * sin(MeanAnomolyRadians)) + (0.0200 * sin(2.0 * (MeanAnomolyRadians))) + (0.0003 * sin(3.0 * (MeanAnomolyRadians)));
+                   double eLs = (MeanAnomoly + 102.9372 + EquationOfCenter + 180.0);
+                   ElipticalLongitudeOfSun = fmod(eLs, 360.0);
+                   ElipticalLongitudeRadians = ElipticalLongitudeOfSun * toRadians;
+                   if (Jtransit == 0.0) {
+                       Jtransit = Japprox + (0.0053 * sin(MeanAnomolyRadians)) - (0.0069 * sin(2.0 * ElipticalLongitudeRadians));
+                   }
                }
-               double Ms = (357.5291 + 0.98560028 * (Japprox - JanuaryFirst2000JDN));
-               MeanAnomoly = fmod(Ms, 360.0);
-               MeanAnomolyRadians = MeanAnomoly * toRadians;
-               double EquationOfCenter = (1.9148 * sin(MeanAnomolyRadians)) + (0.0200 * sin(2.0 * (MeanAnomolyRadians))) + (0.0003 * sin(3.0 * (MeanAnomolyRadians)));
-               double eLs = (MeanAnomoly + 102.9372 + EquationOfCenter + 180.0);
-               ElipticalLongitudeOfSun = fmod(eLs, 360.0);
-               ElipticalLongitudeRadians = ElipticalLongitudeOfSun * toRadians;
-               if (Jtransit == 0.0) {
-                   Jtransit = Japprox + (0.0053 * sin(MeanAnomolyRadians)) - (0.0069 * sin(2.0 * ElipticalLongitudeRadians));
-               }
-           }
-           
-           double DeclinationOfSun = asin( sin(ElipticalLongitudeRadians) * sin(23.45 * toRadians) ) * toDegrees;
-           double DeclinationOfSunRadians = DeclinationOfSun * toRadians;
-           
-           double H1 = (cos(ZenithOfficial * toRadians) - sin(coordinate.latitude * toRadians) * sin(DeclinationOfSunRadians));
-           double H2 = (cos(coordinate.latitude * toRadians) * cos(DeclinationOfSunRadians));
-           double HourAngle = acos( (H1  * toRadians) / (H2  * toRadians) ) * toDegrees;
-           double Jss = JanuaryFirst2000JDN + 0.0009 + ((HourAngle + westLongitude)/360.0) + Nearest;
-           double Jset = Jss + (0.0053 * sin(MeanAnomolyRadians)) - (0.0069 * sin(2.0 * ElipticalLongitudeRadians));
-           double Jrise = Jtransit - (Jset - Jtransit);
-           
-           return @{@(TwilightDateSunrise) : dateFromJulianDayNumber(Jrise),
-                    @(TwilightDateSunset)  : dateFromJulianDayNumber(Jset)};
-       });
+               
+               double DeclinationOfSun = asin( sin(ElipticalLongitudeRadians) * sin(23.45 * toRadians) ) * toDegrees;
+               double DeclinationOfSunRadians = DeclinationOfSun * toRadians;
+               
+               double H1 = (cos(ZenithOfficial * toRadians) - sin(coordinate.latitude * toRadians) * sin(DeclinationOfSunRadians));
+               double H2 = (cos(coordinate.latitude * toRadians) * cos(DeclinationOfSunRadians));
+               double HourAngle = acos( (H1  * toRadians) / (H2  * toRadians) ) * toDegrees;
+               double Jss = JanuaryFirst2000JDN + 0.0009 + ((HourAngle + westLongitude)/360.0) + Nearest;
+               double Jset = Jss + (0.0053 * sin(MeanAnomolyRadians)) - (0.0069 * sin(2.0 * ElipticalLongitudeRadians));
+               double Jrise = Jtransit - (Jset - Jtransit);
+               
+               return @{@(TwilightDateSunrise) : dateFromJulianDayNumber(Jrise),
+                        @(TwilightDateSunset)  : dateFromJulianDayNumber(Jset)};
+           });
+//    };
+    
+//    measureExecutionTime(CMClockGetTime(CMClockGetHostTimeClock()), ^(CMTime elapsedTime) {
+//        CMTimeShow(elapsedTime);
+//    });
 }
 
 
@@ -748,5 +800,6 @@ planetaryHourDataSourceCompletionBlock:(void (^)(NSError * __nullable error))pla
 //}
 
 @end
+
 
 

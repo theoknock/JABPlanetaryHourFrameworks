@@ -17,7 +17,7 @@
 		B93BC49F226E479B00BB32B7 /* JABPlanetaryHourCocoaTouchFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JABPlanetaryHourCocoaTouchFramework.h; sourceTree = "<group>"; };
 		B93BC4A0226E479B00BB32B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B93BC59E226E5A8100BB32B7 /* PlanetaryHourDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlanetaryHourDataSource.m; path = ../../Shared/PlanetaryHourDataSource.m; sourceTree = "<group>"; wrapsLines = 0; };
-		B93BC5A5226E5B1700BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlanetaryHourDataSource.h; path = ../../Shared/PlanetaryHourDataSource.h; sourceTree = "<group>"; };
+		B93BC5A5226E5B1700BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlanetaryHourDataSource.h; path = ../../Shared/PlanetaryHourDataSource.h; sourceTree = "<group>"; wrapsLines = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
