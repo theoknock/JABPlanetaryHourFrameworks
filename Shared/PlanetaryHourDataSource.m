@@ -39,6 +39,7 @@ static PlanetaryHourDataSource *data = NULL;
         //            NSLog(@"block_queue_event");
         //        });
         //        dispatch_resume(self->_block_queue_event);
+        [[self locationManager] requestLocation];
     }
     
     return self;
@@ -58,7 +59,7 @@ static PlanetaryHourDataSource *data = NULL;
                 [lm requestWhenInUseAuthorization];
             }
             lm.delegate = self;
-            
+
             self->_locationManager = lm;
         });
     }
@@ -79,7 +80,6 @@ static PlanetaryHourDataSource *data = NULL;
     if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted)
     {
         NSLog(@"Failure to authorize location services\t%d", status);
-        [manager requestLocation];
     }
     else
     {
@@ -92,8 +92,9 @@ static PlanetaryHourDataSource *data = NULL;
                 dispatch_async(dispatch_get_main_queue(), validateLocation);
             } else {
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"PlanetaryHoursDataSourceUpdatedNotification"
-                                                                    object:manager.location
+                                                                    object:nil
                                                                   userInfo:nil];
+                NSLog(@"POSTED: PlanetaryHoursDataSourceUpdatedNotification");
             }
         };
         
