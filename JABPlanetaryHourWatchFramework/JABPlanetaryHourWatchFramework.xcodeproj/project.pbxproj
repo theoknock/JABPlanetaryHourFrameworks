@@ -36,6 +36,7 @@
 			children = (
 				B93BC4D4226E483000BB32B7 /* JABPlanetaryHourWatchFramework */,
 				B93BC4D3226E483000BB32B7 /* Products */,
+				B942B260227F6AA400A4ADF6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,6 +57,13 @@
 				B93BC4D6226E483000BB32B7 /* Info.plist */,
 			);
 			path = JABPlanetaryHourWatchFramework;
+			sourceTree = "<group>";
+		};
+		B942B260227F6AA400A4ADF6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -282,6 +290,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 5.1;
 			};
 			name = Debug;
 		};
@@ -307,6 +316,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 5.1;
 			};
 			name = Release;
 		};
