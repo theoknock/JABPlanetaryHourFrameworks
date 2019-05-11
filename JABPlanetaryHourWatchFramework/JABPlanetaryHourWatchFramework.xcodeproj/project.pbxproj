@@ -10,6 +10,7 @@
 		B93BC4D7226E483000BB32B7 /* JABPlanetaryHourWatchFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = B93BC4D5226E483000BB32B7 /* JABPlanetaryHourWatchFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B93BC5AA226E5B5900BB32B7 /* PlanetaryHourDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = B93BC5A8226E5B4000BB32B7 /* PlanetaryHourDataSource.m */; };
 		B93BC5AB226E5B5C00BB32B7 /* PlanetaryHourDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = B93BC5A7226E5B3800BB32B7 /* PlanetaryHourDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B9C2566522840C920064340C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9C2566422840C920064340C /* CoreGraphics.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +19,7 @@
 		B93BC4D6226E483000BB32B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B93BC5A7226E5B3800BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlanetaryHourDataSource.h; path = ../../Shared/PlanetaryHourDataSource.h; sourceTree = "<group>"; };
 		B93BC5A8226E5B4000BB32B7 /* PlanetaryHourDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlanetaryHourDataSource.m; path = ../../Shared/PlanetaryHourDataSource.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B9C2566422840C920064340C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -25,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B9C2566522840C920064340C /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +65,7 @@
 		B942B260227F6AA400A4ADF6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B9C2566422840C920064340C /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -290,7 +294,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 5.1;
+				WATCHOS_DEPLOYMENT_TARGET = 5.2;
 			};
 			name = Debug;
 		};
@@ -316,7 +320,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 5.1;
+				WATCHOS_DEPLOYMENT_TARGET = 5.2;
 			};
 			name = Release;
 		};

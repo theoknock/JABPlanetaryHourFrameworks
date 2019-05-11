@@ -102,6 +102,8 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
 
 - (UIImage * _Nonnull (^)(NSString * _Nonnull, UIColor * _Nullable, CGFloat))imageFromText;
 
+- (NSDictionary *)placeholderPlanetaryHourData;
+
 @end
 
 NS_ASSUME_NONNULL_END

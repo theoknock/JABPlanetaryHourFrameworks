@@ -83,14 +83,17 @@ static PlanetaryHourDataSource *data = NULL;
     }
     else
     {
+        [manager requestLocation];
         void (^validateLocation)(void);
         validateLocation = ^(void) {
             if ((manager.location.coordinate.latitude  == 0.0  ||
                  manager.location.coordinate.longitude == 0.0) ||
                 !CLLocationCoordinate2DIsValid(manager.location.coordinate))
             {
-                dispatch_async(dispatch_get_main_queue(), validateLocation);
+//                dispatch_async(dispatch_get_main_queue(), validateLocation);
+                validateLocation();
             } else {
+                NSLog(@"%f\t%f", manager.location.coordinate.latitude, manager.location.coordinate.longitude);
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"PlanetaryHoursDataSourceUpdatedNotification"
                                                                     object:nil
                                                                   userInfo:nil];
@@ -98,13 +101,18 @@ static PlanetaryHourDataSource *data = NULL;
             }
         };
         
-        dispatch_async(dispatch_get_main_queue(), validateLocation);
+//        dispatch_async(dispatch_get_main_queue(), validateLocation);
+//        validateLocation();
     }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"PlanetaryHoursDataSourceUpdatedNotification"
+                                                        object:nil
+                                                      userInfo:nil];
+    NSLog(@"POSTED: PlanetaryHoursDataSourceUpdatedNotification");
 }
 
 #pragma mark - Planetary hour calculation definitions and enumerations
@@ -167,8 +175,10 @@ NSString *(^planetAbbreviatedNameForPlanet)(NSString *) = ^(NSString *planetName
         return @"VENS";
     if ([planetName isEqualToString:@"Saturn"])
         return @"STRN";
+    if (!planetName)
+        return @"EART";
     else
-        return @"SUN";
+        return @"EART";
 };
 
 
@@ -293,7 +303,7 @@ typedef NS_ENUM(NSUInteger, PlanetColor) {
         else if ([planetarySymbol isEqualToString:@"♄"])
             return [UIColor grayColor];
         else
-            return [UIColor yellowColor];
+            return [UIColor greenColor];
     };
 };
 
@@ -315,7 +325,7 @@ typedef NS_ENUM(NSUInteger, PlanetColor) {
         else if ([planetarySymbol isEqualToString:@"♄"])
             return Saturn;
         else
-            return Sun;
+            return (Planet)NAN;
     };
 };
 
@@ -361,7 +371,7 @@ NSAttributedString *(^attributedPlanetSymbol)(NSString *) = ^(NSString *symbol) 
                                                                  NSStrokeWidthAttributeName     : [NSNumber numberWithFloat:-2.0]
                                                                  };
         
-        CGSize textSize = [text sizeWithAttributes:centerAlignedTextAttributes];
+        CGSize textSize = [((!text) ? @"㊏" : text) sizeWithAttributes:centerAlignedTextAttributes];
         UIGraphicsBeginImageContextWithOptions(textSize, NO, 0);
         [text drawAtPoint:CGPointZero withAttributes:centerAlignedTextAttributes];
         
@@ -667,6 +677,22 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
 //    measureExecutionTime(CMClockGetTime(CMClockGetHostTimeClock()), ^(CMTime elapsedTime) {
 //        CMTimeShow(elapsedTime);
 //    });
+}
+
+- (NSDictionary *)placeholderPlanetaryHourData
+{
+    NSMutableDictionary *planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:8];
+    [planetaryHourData setObject:[NSDate date] forKey:@(StartDate)];
+    [planetaryHourData setObject:[NSDate date] forKey:@(EndDate)];
+    [planetaryHourData setObject:@"㊏" forKey:@(Symbol)];
+    [planetaryHourData setObject:@"Earth" forKey:@(Name)];
+    [planetaryHourData setObject:@"㊏" forKey:@(Abbreviation)];
+    [planetaryHourData setObject:[UIColor greenColor] forKey:@(Color)];
+    [planetaryHourData setObject:[NSNumber numberWithInteger:0] forKey:@(Hour)];
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:39.590057 longitude:-86.076453];
+    [planetaryHourData setObject:location forKey:@(Coordinate)];
+    
+    return (NSDictionary *)planetaryHourData;
 }
 
 
