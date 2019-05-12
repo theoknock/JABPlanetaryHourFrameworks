@@ -59,6 +59,7 @@ static PlanetaryHourDataSource *data = NULL;
                 [lm requestWhenInUseAuthorization];
             }
             lm.delegate = self;
+            [lm requestLocation];
 
             self->_locationManager = lm;
         });
@@ -556,25 +557,29 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                     [planetaryHoursData addObject:planetaryHourData];
                     if (planetaryHourCompletionBlock != nil) planetaryHourCompletionBlock(planetaryHourData);
                     
-                    dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
+//                    dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
                         currentHour = [hours indexGreaterThanIndex:currentHour];
                         if (currentHour != NSNotFound)
                         {
                             calculatePlanetaryHourData(solarCycleData);
                         } else {
-                            dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
+//                            dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
                                 currentIndex = [days indexGreaterThanIndex:currentIndex];
                                 if (currentIndex != NSNotFound)
                                 {
                                     solarCycleDates(outgoingTwilightDates);
-                                    if (planetaryHoursCompletionBlock != nil) planetaryHoursCompletionBlock(planetaryHoursData);
                                 } else {
 //                                    executionTime(CMTimeSubtract(CMClockGetTime(CMClockGetHostTimeClock()), start));
                                     if (planetaryHourDataSourceCompletionBlock != nil) planetaryHourDataSourceCompletionBlock(nil);
                                 }
-                            });
+                            if (planetaryHoursCompletionBlock != nil)
+                            {
+                                NSLog(@"CALLING planetaryHoursCompletionBlock");
+                                planetaryHoursCompletionBlock(planetaryHoursData);
+                            }
+//                            });
                         }
-                    });
+//                    });
                 }; calculatePlanetaryHourData(solarCycle);
                 
             }; solarCycleDates(solarCycleDataProvider(solarCycleDataProviderDate(date), solarCycleDataProviderLocation(location), dateFromJulianDayNumber));
@@ -684,7 +689,7 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
     NSMutableDictionary *planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:8];
     [planetaryHourData setObject:[NSDate date] forKey:@(StartDate)];
     [planetaryHourData setObject:[NSDate date] forKey:@(EndDate)];
-    [planetaryHourData setObject:@"㊏" forKey:@(Symbol)];
+    [planetaryHourData setObject:attributedPlanetSymbol(@"㊏") forKey:@(Symbol)];
     [planetaryHourData setObject:@"Earth" forKey:@(Name)];
     [planetaryHourData setObject:@"㊏" forKey:@(Abbreviation)];
     [planetaryHourData setObject:[UIColor greenColor] forKey:@(Color)];
