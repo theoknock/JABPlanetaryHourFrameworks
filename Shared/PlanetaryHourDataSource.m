@@ -14,6 +14,19 @@ double const toDegrees = 180 / M_PI;
 
 @implementation PlanetaryHourDataSource
 
+@synthesize planetaryHourDataSourceDelegate = _planetaryHourDataSourceDelegate;
+
+- (void)setPlanetaryHourDataSourceDelegate:(id<PlanetaryHourDataSourceLogDelegate>)planetaryHourDataSourceDelegate
+{
+    if ([planetaryHourDataSourceDelegate conformsToProtocol:@protocol(PlanetaryHourDataSourceLogDelegate)])
+        _planetaryHourDataSourceDelegate = planetaryHourDataSourceDelegate;
+}
+
+- (id<PlanetaryHourDataSourceLogDelegate>)planetaryHourDataSourceDelegate
+{
+    return _planetaryHourDataSourceDelegate;
+}
+
 static PlanetaryHourDataSource *data = NULL;
 + (nonnull PlanetaryHourDataSource *)data
 {
@@ -83,26 +96,7 @@ static PlanetaryHourDataSource *data = NULL;
     }
     else
     {
-        //        [manager requestLocation];
-        //        void (^validateLocation)(void);
-        //        validateLocation = ^(void) {
-        //            if ((manager.location.coordinate.latitude  == 0.0  ||
-        //                 manager.location.coordinate.longitude == 0.0) ||
-        //                !CLLocationCoordinate2DIsValid(manager.location.coordinate))
-        //            {
-        ////                dispatchv asd_async(dispatch_get_main_queue(), validateLocation);
-        //                validateLocation();
-        //            } else {
-        //                NSLog(@"%f\t%f", manager.location.coordinate.latitude, manager.location.coordinate.longitude);
-        //                [[NSNotificationCenter defaultCenter] postNotificationName:@"PlanetaryHoursDataSourceUpdatedNotification"
-        //                                                                    object:nil
-        //                                                                  userInfo:nil];
-        //                NSLog(@"POSTED: PlanetaryHoursDataSourceUpdatedNotification");
-        //            }
-        //        };
-        //
-        //        dispatch_async(dispatch_get_main_queue(), validateLocation);
-        ////        validateLocation();
+        
     }
 }
 
@@ -180,7 +174,6 @@ NSString *(^planetAbbreviatedNameForPlanet)(NSString *) = ^(NSString *planetName
     else
         return @"EART";
 };
-
 
 //- (NSDate *)localDateForDate:(NSDate *)date
 //{
@@ -577,20 +570,15 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                             {
                                 calculatePlanetaryHourData(solarCycleData);
                             } else {
-                                dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
-                                    currentIndex = [days indexGreaterThanIndex:currentIndex];
-                                    if (currentIndex != NSNotFound)
-                                    {
-                                        solarCycleDates(outgoingTwilightDates);
-                                    } else {
-                                        //                                    executionTime(CMTimeSubtract(CMClockGetTime(CMClockGetHostTimeClock()), start));
-                                        if (planetaryHourDataSourceCompletionBlock != nil) planetaryHourDataSourceCompletionBlock(nil);
-                                    }
-                                    if (planetaryHoursCompletionBlock != nil)
-                                    {
-                                        planetaryHoursCompletionBlock(planetaryHoursData);
-                                    }
-                                });
+                                if (planetaryHoursCompletionBlock != nil) planetaryHoursCompletionBlock(planetaryHoursData);
+                                currentIndex = [days indexGreaterThanIndex:currentIndex];
+                                if (currentIndex != NSNotFound)
+                                {
+                                    solarCycleDates(outgoingTwilightDates);
+                                } else {
+                                    //                                    executionTime(CMTimeSubtract(CMClockGetTime(CMClockGetHostTimeClock()), start));
+                                    if (planetaryHourDataSourceCompletionBlock != nil) planetaryHourDataSourceCompletionBlock(nil);
+                                }
                             }
                         });
                     }; calculatePlanetaryHourData(solarCycle);
@@ -694,7 +682,7 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
         }
     };
     validateLocation();
-//    dispatch_async(dispatch_get_main_queue(), validateLocation);
+    //    dispatch_async(dispatch_get_main_queue(), validateLocation);
     
     
     //    };
@@ -852,6 +840,7 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
 //}
 
 @end
+
 
 
 

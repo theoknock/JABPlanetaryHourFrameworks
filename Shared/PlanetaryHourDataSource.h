@@ -77,10 +77,24 @@ typedef NS_ENUM(NSUInteger, PlanetaryHour) {
     PlanetaryHourEndDate
 };
 
+typedef NS_ENUM(NSUInteger, LogEntryType) {
+    Error,
+    Success,
+    Operation, // a function
+    Event      // a result
+};
+
+@protocol PlanetaryHourDataSourceLogDelegate <NSObject>
+
+@required
+- (void)log:(NSString *)context entry:(NSString *)entry status:(LogEntryType)type;
+
+@end
+
 @interface PlanetaryHourDataSource : NSArray <CLLocationManagerDelegate>
 
 + (nonnull PlanetaryHourDataSource *)data;
-
+@property (weak, nonatomic) id<PlanetaryHourDataSourceLogDelegate> planetaryHourDataSourceDelegate;
 @property (strong, nonatomic) CLLocationManager *locationManager;
 
 //@property (strong, nonatomic) __block dispatch_queue_t block_queue;
