@@ -96,7 +96,7 @@ static PlanetaryHourDataSource *data = NULL;
     }
     else
     {
-        
+        [manager startUpdatingLocation];
     }
 }
 

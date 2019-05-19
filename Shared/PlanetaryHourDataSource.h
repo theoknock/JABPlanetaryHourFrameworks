@@ -78,10 +78,10 @@ typedef NS_ENUM(NSUInteger, PlanetaryHour) {
 };
 
 typedef NS_ENUM(NSUInteger, LogEntryType) {
-    Error,
-    Success,
-    Operation, // a function
-    Event      // a result
+    LogEntryTypeError,
+    LogEntryTypeSuccess,
+    LogEntryTypeOperation, // a function
+    LogEntryTypeEvent      // a result
 };
 
 @protocol PlanetaryHourDataSourceLogDelegate <NSObject>
