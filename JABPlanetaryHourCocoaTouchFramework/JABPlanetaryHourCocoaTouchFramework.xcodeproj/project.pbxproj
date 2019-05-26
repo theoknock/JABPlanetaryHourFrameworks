@@ -13,6 +13,7 @@
 		B9C04C53229B0CE2002F4DAB /* PlanetaryHourGPUCalculator.h in Headers */ = {isa = PBXBuildFile; fileRef = B9C04C51229B0CE1002F4DAB /* PlanetaryHourGPUCalculator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B9C04C54229B0CE2002F4DAB /* PlanetaryHourGPUCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = B9C04C52229B0CE1002F4DAB /* PlanetaryHourGPUCalculator.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		B9C04C57229B0EE3002F4DAB /* julianDayNumber.metal in Sources */ = {isa = PBXBuildFile; fileRef = B9C04C56229B0EE3002F4DAB /* julianDayNumber.metal */; settings = {ATTRIBUTES = (Public, ); }; };
+		B9C04C5C229B16C3002F4DAB /* dateFromJulianDayNumber.metal in Sources */ = {isa = PBXBuildFile; fileRef = B9C04C5B229B16C3002F4DAB /* dateFromJulianDayNumber.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		B9C04C51229B0CE1002F4DAB /* PlanetaryHourGPUCalculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlanetaryHourGPUCalculator.h; path = ../../Shared/PlanetaryHourGPUCalculator.h; sourceTree = "<group>"; };
 		B9C04C52229B0CE1002F4DAB /* PlanetaryHourGPUCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlanetaryHourGPUCalculator.m; path = ../../Shared/PlanetaryHourGPUCalculator.m; sourceTree = "<group>"; };
 		B9C04C56229B0EE3002F4DAB /* julianDayNumber.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = julianDayNumber.metal; path = ../../Shared/julianDayNumber.metal; sourceTree = "<group>"; };
+		B9C04C5B229B16C3002F4DAB /* dateFromJulianDayNumber.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = dateFromJulianDayNumber.metal; path = ../../Shared/dateFromJulianDayNumber.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				B9C04C51229B0CE1002F4DAB /* PlanetaryHourGPUCalculator.h */,
 				B9C04C52229B0CE1002F4DAB /* PlanetaryHourGPUCalculator.m */,
 				B9C04C56229B0EE3002F4DAB /* julianDayNumber.metal */,
+				B9C04C5B229B16C3002F4DAB /* dateFromJulianDayNumber.metal */,
 				B93BC4A0226E479B00BB32B7 /* Info.plist */,
 			);
 			path = JABPlanetaryHourCocoaTouchFramework;
@@ -149,6 +152,7 @@
 			files = (
 				B93BC59F226E5A8100BB32B7 /* PlanetaryHourDataSource.m in Sources */,
 				B9C04C54229B0CE2002F4DAB /* PlanetaryHourGPUCalculator.m in Sources */,
+				B9C04C5C229B16C3002F4DAB /* dateFromJulianDayNumber.metal in Sources */,
 				B9C04C57229B0EE3002F4DAB /* julianDayNumber.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
