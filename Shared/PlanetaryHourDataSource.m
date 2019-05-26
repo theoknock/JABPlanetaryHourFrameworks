@@ -692,6 +692,9 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
     //    });
 }
 
+
+
+
 - (NSDictionary *)placeholderPlanetaryHourData
 {
     NSMutableDictionary *planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:8];
