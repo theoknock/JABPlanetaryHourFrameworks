@@ -41,10 +41,11 @@
 		B93BC4DD226E483000BB32B7 /* JABPlanetaryHourWatchFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JABPlanetaryHourWatchFramework.xcodeproj; path = JABPlanetaryHourWatchFramework/JABPlanetaryHourWatchFramework.xcodeproj; sourceTree = "<group>"; };
 		B93BC59C226E5A4B00BB32B7 /* PlanetaryHourDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlanetaryHourDataSource.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B93BC5A2226E5AD800BB32B7 /* PlanetaryHourDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlanetaryHourDataSource.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B95CAB84229B3AD100F43576 /* SolarCalculator.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SolarCalculator.metal; sourceTree = "<group>"; };
 		B9C04C4D229B0CBA002F4DAB /* PlanetaryHourGPUCalculator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlanetaryHourGPUCalculator.h; sourceTree = "<group>"; };
-		B9C04C4E229B0CBA002F4DAB /* PlanetaryHourGPUCalculator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlanetaryHourGPUCalculator.m; sourceTree = "<group>"; };
-		B9C04C55229B0D59002F4DAB /* julianDayNumber.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = julianDayNumber.metal; sourceTree = "<group>"; wrapsLines = 0; };
-		B9C04C58229B119B002F4DAB /* dateFromJulianDayNumber.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = dateFromJulianDayNumber.metal; sourceTree = "<group>"; };
+		B9C04C4E229B0CBA002F4DAB /* PlanetaryHourGPUCalculator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlanetaryHourGPUCalculator.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B9C04C55229B0D59002F4DAB /* JulianDayNumberFromDate.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = JulianDayNumberFromDate.metal; sourceTree = "<group>"; wrapsLines = 0; };
+		B9C04C58229B119B002F4DAB /* DateFromJulianDayNumber.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DateFromJulianDayNumber.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -80,8 +81,9 @@
 				B93BC5A2226E5AD800BB32B7 /* PlanetaryHourDataSource.m */,
 				B9C04C4D229B0CBA002F4DAB /* PlanetaryHourGPUCalculator.h */,
 				B9C04C4E229B0CBA002F4DAB /* PlanetaryHourGPUCalculator.m */,
-				B9C04C55229B0D59002F4DAB /* julianDayNumber.metal */,
-				B9C04C58229B119B002F4DAB /* dateFromJulianDayNumber.metal */,
+				B9C04C55229B0D59002F4DAB /* JulianDayNumberFromDate.metal */,
+				B9C04C58229B119B002F4DAB /* DateFromJulianDayNumber.metal */,
+				B95CAB84229B3AD100F43576 /* SolarCalculator.metal */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
