@@ -46,7 +46,9 @@ typedef NS_ENUM(NSUInteger, PlanetaryHourData) {
     Color,
     Hour,
     StartCoordinate,
-    EndCoordinate
+    EndCoordinate,
+    CurrentCoordinate,
+    MetersPerPlanetaryHour
 };
 
 #define SECONDS_PER_DAY 86400.00f
@@ -109,7 +111,7 @@ planetaryHourDataSourceStartCompletionBlock:(void(^ _Nullable)(void))planetaryHo
  solarCycleCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, NSDate *> * _Nonnull solarCycle))solarCycleCompletionBlock
 planetaryHourCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
 planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *, id> *> * _Nonnull planetaryHours))planetaryHoursCompletionBlock
-planetaryHoursCalculationsCompletionBlock:(void(^ _Nullable)(NSArray<NSArray<NSDictionary<NSNumber *, id> *> *> * _Nullable planetaryHours))planetaryHoursCalculationsCompletionBlock
+planetaryHoursCalculationsCompletionBlock:(void(^ _Nullable)(NSArray<NSArray<NSDictionary<NSNumber *, id> *> *> * _Nullable planetaryHoursArrays))planetaryHoursCalculationsCompletionBlock
 planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
 
 @property (strong, nonatomic) Planet (^planetForPlanetSymbol)(NSString *planetarySymbol);
@@ -117,6 +119,7 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
 @property (strong, nonatomic) UIColor *(^colorForPlanetSymbol)(NSString *planetarySymbol);
 
 - (UIImage * _Nonnull (^)(NSString * _Nonnull, UIColor * _Nullable, CGFloat))imageFromText;
+
 
 - (NSDictionary *)placeholderPlanetaryHourData;
 
