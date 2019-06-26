@@ -457,7 +457,7 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
         {
             dispatch_async(dispatch_get_main_queue(), validateLocation);
         } else {
-            NSMutableArray<NSArray<NSDictionary<NSNumber *,id> *> *> *planetaryHoursDataArrays = [[NSMutableArray alloc] initWithCapacity:days.count];
+            __block NSMutableArray<NSMutableArray<NSDictionary<NSNumber *,id> *> *> *planetaryHoursDataArrays = [[NSMutableArray alloc] initWithCapacity:days.count];
             
             ^void (void(^solarCycleCompletionBlock)(NSDictionary<NSNumber *, NSDate *> *),
                    NSDate * _Nullable date,
@@ -490,7 +490,7 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
                     if (solarCycleCompletionBlock != nil) solarCycleCompletionBlock(solarCycle);
                     
                     __block NSMutableArray *planetaryHoursData = [[NSMutableArray alloc] initWithCapacity:hours.count];
-                    
+                    [planetaryHoursDataArrays addObject:[NSMutableArray new]];
                     __block void(^calculatePlanetaryHourData)(NSDictionary<NSNumber *, NSDate *> *);
                     __block NSUInteger currentHour = hours.firstIndex;
                     calculatePlanetaryHourData = ^(NSDictionary<NSNumber *, NSDate *> *solarCycleData)
@@ -575,6 +575,8 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
                         }];
                         
                         [planetaryHoursData addObject:planetaryHourData];
+                        [(NSMutableArray *)[planetaryHoursDataArrays lastObject] addObject:planetaryHourData];
+                        
                         if (planetaryHourCompletionBlock != nil) planetaryHourCompletionBlock(planetaryHourData);
                         
                         dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_HIGH), ^{
@@ -584,7 +586,8 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
                                 calculatePlanetaryHourData(solarCycleData);
                             } else {
                                 if (planetaryHoursCompletionBlock != nil) planetaryHoursCompletionBlock(planetaryHoursData);
-                                if (planetaryHourDataSourceCompletionBlock != nil) [planetaryHoursDataArrays addObject:planetaryHoursData];
+                                // TO-DO: Add a newly allocated array to planetaryHoursDataArrays, and then add new planetary hour data (don't copy)
+//                                if (planetaryHourDataSourceCompletionBlock != nil) [planetaryHoursDataArrays addObject:[planetaryHoursData copy]];
                                 currentIndex = [days indexGreaterThanIndex:currentIndex];
                                 if (currentIndex != NSNotFound)
                                 {
