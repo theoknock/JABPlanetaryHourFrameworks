@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
+#import <simd/simd.h>
+
 
 #import "PlanetaryHourDataSource.h"
 
@@ -24,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     id<MTLBuffer> metalBufferIn;
     id<MTLBuffer> metalBufferOut;
+    
+    dispatch_queue_t loggerQueue;
+    dispatch_queue_t taskQueue;
 }
 
 + (nonnull PlanetaryHourGPUCalculator *)calculation;

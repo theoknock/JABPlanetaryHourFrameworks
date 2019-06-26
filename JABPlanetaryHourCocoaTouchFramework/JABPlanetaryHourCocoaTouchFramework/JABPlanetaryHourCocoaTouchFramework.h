@@ -17,4 +17,4 @@ FOUNDATION_EXPORT const unsigned char JABPlanetaryHourCocoaTouchFrameworkVersion
 // In this header, you should import all the public headers of your framework using statements like #import <JABPlanetaryHourCocoaTouchFramework/PublicHeader.h>
 
 #import "PlanetaryHourDataSource.h"
-#import "PlanetaryHourGPUCalculator.h"
+//#import "PlanetaryHourGPUCalculator.h"

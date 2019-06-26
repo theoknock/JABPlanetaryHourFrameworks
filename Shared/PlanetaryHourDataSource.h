@@ -45,7 +45,8 @@ typedef NS_ENUM(NSUInteger, PlanetaryHourData) {
     Abbreviation,
     Color,
     Hour,
-    Coordinate
+    StartCoordinate,
+    EndCoordinate
 };
 
 #define SECONDS_PER_DAY 86400.00f
@@ -88,7 +89,6 @@ typedef NS_ENUM(NSUInteger, LogEntryType) {
 
 @required
 - (void)log:(NSString *)context entry:(NSString *)entry status:(LogEntryType)type;
-
 @end
 
 @interface PlanetaryHourDataSource : NSArray <CLLocationManagerDelegate>
@@ -105,9 +105,11 @@ typedef NS_ENUM(NSUInteger, LogEntryType) {
 - (void)solarCyclesForDays:(NSIndexSet *)days
          planetaryHourData:(NSIndexSet *)data
             planetaryHours:(NSIndexSet *)hours
-             solarCycleCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, NSDate *> * _Nonnull solarCycle))solarCycleCompletionBlock
-          planetaryHourCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
-         planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *, id> *> * _Nonnull planetaryHours))planetaryHoursCompletionBlock
+planetaryHourDataSourceStartCompletionBlock:(void(^ _Nullable)(void))planetaryHourDataSourceStartCompletionBlock
+ solarCycleCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, NSDate *> * _Nonnull solarCycle))solarCycleCompletionBlock
+planetaryHourCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
+planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *, id> *> * _Nonnull planetaryHours))planetaryHoursCompletionBlock
+planetaryHoursCalculationsCompletionBlock:(void(^ _Nullable)(NSArray<NSArray<NSDictionary<NSNumber *, id> *> *> * _Nullable planetaryHours))planetaryHoursCalculationsCompletionBlock
 planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
 
 @property (strong, nonatomic) Planet (^planetForPlanetSymbol)(NSString *planetarySymbol);

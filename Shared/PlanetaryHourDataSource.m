@@ -437,10 +437,12 @@ NSAttributedString *(^attributedPlanetSymbol)(NSString *) = ^(NSString *symbol) 
 - (void)solarCyclesForDays:(NSIndexSet *)days
          planetaryHourData:(NSIndexSet *)data
             planetaryHours:(NSIndexSet *)hours
+planetaryHourDataSourceStartCompletionBlock:(void (^ _Nullable)(void))planetaryHourDataSourceStartCompletionBlock
  solarCycleCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, NSDate *> * _Nonnull solarCycle))solarCycleCompletionBlock
 planetaryHourCompletionBlock:(void(^ _Nullable)(NSDictionary<NSNumber *, id> * _Nonnull planetaryHour))planetaryHourCompletionBlock
 planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *, id> *> * _Nonnull planetaryHours))planetaryHoursCompletionBlock
-planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable error))planetaryHourDataSourceCompletionBlock;
+planetaryHoursCalculationsCompletionBlock:(void (^ _Nullable)(NSArray<NSArray<NSDictionary<NSNumber *,id> *> *> * _Nullable))planetaryHoursCalculationsCompletionBlock
+planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))planetaryHourDataSourceCompletionBlock
 {
     //    typedef void (^ExecutionTimeMeasurement)(CMTime elapsedTime);
     //    typedef void(^MeasureExecutionTime)(ExecutionTimeMeasurement executionTime);
@@ -455,6 +457,8 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
         {
             dispatch_async(dispatch_get_main_queue(), validateLocation);
         } else {
+            NSMutableArray<NSArray<NSDictionary<NSNumber *,id> *> *> *planetaryHoursDataArrays = [[NSMutableArray alloc] initWithCapacity:days.count];
+            
             ^void (void(^solarCycleCompletionBlock)(NSDictionary<NSNumber *, NSDate *> *),
                    NSDate * _Nullable date,
                    CLLocation * _Nullable location,
@@ -483,9 +487,7 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                                                                                                                                       @(SolarCycleDateEnd)]];
                     
                     
-                    if (solarCycleCompletionBlock != nil) {
-                        solarCycleCompletionBlock(solarCycle);
-                    }
+                    if (solarCycleCompletionBlock != nil) solarCycleCompletionBlock(solarCycle);
                     
                     __block NSMutableArray *planetaryHoursData = [[NSMutableArray alloc] initWithCapacity:hours.count];
                     
@@ -496,11 +498,11 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                         NSTimeInterval transitDuration    = [(currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateMid)] : [solarCycleData objectForKey:@(SolarCycleDateEnd)] timeIntervalSinceDate:(currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateStart)] : [solarCycleData objectForKey:@(SolarCycleDateMid)]];
                         NSTimeInterval hourDuration       = (transitDuration / 12);
                         NSInteger mod_hour                = currentHour % 12;
-                        NSTimeInterval startTimeInterval  = hourDuration * mod_hour;
                         NSDate *sinceDate                 = (currentHour < 12) ? [solarCycleData objectForKey:@(SolarCycleDateStart)] : [solarCycleData objectForKey:@(SolarCycleDateMid)];
-                        NSDate *startTime                 = [[NSDate alloc] initWithTimeInterval:startTimeInterval sinceDate:sinceDate];
-                        NSTimeInterval endTimeInterval    = hourDuration * (mod_hour + 1);
-                        NSDate *endTime                   = [[NSDate alloc] initWithTimeInterval:endTimeInterval sinceDate:sinceDate];
+                        NSTimeInterval startDateInterval  = hourDuration * mod_hour;
+                        NSDate *startDate                 = [[NSDate alloc] initWithTimeInterval:startDateInterval sinceDate:sinceDate];
+                        NSTimeInterval endDateInterval    = hourDuration * (mod_hour + 1);
+                        NSDate *endDate                   = [[NSDate alloc] initWithTimeInterval:endDateInterval sinceDate:sinceDate];
                         
                         // time
                         NSTimeInterval seconds_in_day        = [[solarCycleData objectForKey:@(SolarCycleDateMid)] timeIntervalSinceDate:[solarCycleData objectForKey:@(SolarCycleDateStart)]];
@@ -521,17 +523,24 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                         NSString *name                    = planetNameForHour([solarCycleData objectForKey:@(SolarCycleDateStart)], currentHour);
                         NSString *abbr                    = planetAbbreviatedNameForPlanet(name);
                         UIColor *color                    = PlanetaryHourDataSource.data.colorForPlanetSymbol([symbol string]);
-                        CLLocation *coordinate            = PlanetaryHourDataSource.data.locatePlanetaryHour(location, date, meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset, currentHour);
+                        CLLocation *start_coordinate      = PlanetaryHourDataSource.data.locatePlanetaryHour(location, date, meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset, currentHour);
+//                        NSDate *endCoordinateDate         = [date dateByAddingTimeInterval:[endDate timeIntervalSinceDate:startDate]];
+                        CLLocation *end_coordinate        = PlanetaryHourDataSource.data.locatePlanetaryHour(location, date, meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset + [endDate timeIntervalSinceDate:startDate], currentHour);
                         NSMutableDictionary * planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:data.count];
+                        
+                        
                         [data enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
                             switch (idx) {
                                 case StartDate:
-                                    [planetaryHourData setObject:startTime forKey:@(StartDate)];
+                                {
+                                    [planetaryHourData setObject:startDate forKey:@(StartDate)];
                                     break;
+                                }
                                 case EndDate:
-                                    [planetaryHourData setObject:endTime forKey:@(EndDate)];
+                                {
+                                    [planetaryHourData setObject:endDate forKey:@(EndDate)];
                                     break;
-                                    
+                                }
                                 case Symbol:
                                     [planetaryHourData setObject:symbol forKey:@(Symbol)];
                                     break;
@@ -552,8 +561,12 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                                     [planetaryHourData setObject:[NSNumber numberWithInteger:currentHour] forKey:@(Hour)];
                                     break;
                                     
-                                case Coordinate:
-                                    [planetaryHourData setObject:coordinate forKey:@(Coordinate)];
+                                case StartCoordinate:
+                                    [planetaryHourData setObject:start_coordinate forKey:@(StartCoordinate)];
+                                    break;
+                                    
+                                case EndCoordinate:
+                                    [planetaryHourData setObject:end_coordinate forKey:@(EndCoordinate)];
                                     break;
                                     
                                 default:
@@ -571,12 +584,13 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                                 calculatePlanetaryHourData(solarCycleData);
                             } else {
                                 if (planetaryHoursCompletionBlock != nil) planetaryHoursCompletionBlock(planetaryHoursData);
+                                if (planetaryHourDataSourceCompletionBlock != nil) [planetaryHoursDataArrays addObject:planetaryHoursData];
                                 currentIndex = [days indexGreaterThanIndex:currentIndex];
                                 if (currentIndex != NSNotFound)
                                 {
                                     solarCycleDates(outgoingTwilightDates);
                                 } else {
-                                    //                                    executionTime(CMTimeSubtract(CMClockGetTime(CMClockGetHostTimeClock()), start));
+                                    if (planetaryHoursCalculationsCompletionBlock != nil) planetaryHoursCalculationsCompletionBlock(planetaryHoursDataArrays);
                                     if (planetaryHourDataSourceCompletionBlock != nil) planetaryHourDataSourceCompletionBlock(nil);
                                 }
                             }
@@ -681,6 +695,7 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
                });
         }
     };
+//    if (planetaryHourDataSourceStartCompletionBlock != nil) planetaryHourDataSourceStartCompletionBlock();
     validateLocation();
     //    dispatch_async(dispatch_get_main_queue(), validateLocation);
     
@@ -706,7 +721,8 @@ planetaryHourDataSourceCompletionBlock:(void(^ _Nullable)(NSError * __nullable e
     [planetaryHourData setObject:[UIColor greenColor] forKey:@(Color)];
     [planetaryHourData setObject:[NSNumber numberWithInteger:0] forKey:@(Hour)];
     CLLocation *location = [[CLLocation alloc] initWithLatitude:39.590057 longitude:-86.076453];
-    [planetaryHourData setObject:location forKey:@(Coordinate)];
+    [planetaryHourData setObject:location forKey:@(StartCoordinate)];
+    [planetaryHourData setObject:location forKey:@(EndCoordinate)];
     
     return (NSDictionary *)planetaryHourData;
 }
