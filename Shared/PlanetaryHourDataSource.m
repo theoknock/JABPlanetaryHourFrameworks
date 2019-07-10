@@ -524,9 +524,9 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
                         NSString *name                    = planetNameForHour([solarCycleData objectForKey:@(SolarCycleDateStart)], currentHour);
                         NSString *abbr                    = planetAbbreviatedNameForPlanet(name);
                         UIColor *color                    = PlanetaryHourDataSource.data.colorForPlanetSymbol([symbol string]);
-                        CLLocation *start_coordinate      = PlanetaryHourDataSource.data.locatePlanetaryHour(location, [incomingTwilightDates objectForKey:@(TwilightDateSunrise)], meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset, currentHour);
+                        CLLocation *start_coordinate      = PlanetaryHourDataSource.data.locatePlanetaryHour(location, [incomingTwilightDates objectForKey:@(TwilightDateSunrise)], meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset + [endDate timeIntervalSinceDate:startDate], currentHour);
                         CLLocation *current_coordinate    = PlanetaryHourDataSource.data.locatePlanetaryHour(location, [NSDate date], meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset, currentHour);
-                        CLLocation *end_coordinate        = PlanetaryHourDataSource.data.locatePlanetaryHour(location, [incomingTwilightDates objectForKey:@(TwilightDateSunrise)], meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, timeOffset + [endDate timeIntervalSinceDate:startDate], currentHour);
+                        CLLocation *end_coordinate        = PlanetaryHourDataSource.data.locatePlanetaryHour(location, [incomingTwilightDates objectForKey:@(TwilightDateSunrise)], meters_per_second, meters_per_day, meters_per_day_hour, meters_per_night_hour, /*timeOffset + */[endDate timeIntervalSinceDate:startDate], currentHour);
                         CLLocationDistance metersPerPlanetaryHour = (CLLocationDistance)(currentHour < 12) ? meters_per_day_hour : meters_per_night_hour;
                         NSMutableDictionary * planetaryHourData = [[NSMutableDictionary alloc] initWithCapacity:data.count];
                         
