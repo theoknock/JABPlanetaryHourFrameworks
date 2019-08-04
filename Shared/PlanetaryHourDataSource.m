@@ -448,10 +448,14 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
     //    typedef void(^MeasureExecutionTime)(ExecutionTimeMeasurement executionTime);
     //    void(^measureExecutionTime)(CMTime, ExecutionTimeMeasurement) = ^(CMTime start, ExecutionTimeMeasurement executionTime)
     //    {
+    __block NSUInteger validateLocationBlockExecuteCounter = 0;
     __block void (^validateLocation)(void);
     validateLocation = ^(void) {
-        if ((PlanetaryHourDataSource.data.locationManager.location.coordinate.latitude  == 0.0  ||
-             PlanetaryHourDataSource.data.locationManager.location.coordinate.longitude == 0.0) ||
+//        NSLog(@"Validating location...");
+        validateLocationBlockExecuteCounter++;
+        if ((validateLocationBlockExecuteCounter < 20 &&
+             (PlanetaryHourDataSource.data.locationManager.location.coordinate.latitude  == 0.0  ||
+              PlanetaryHourDataSource.data.locationManager.location.coordinate.longitude == 0.0)) ||
             !CLLocationCoordinate2DIsValid(PlanetaryHourDataSource.data.locationManager.location.coordinate))
         {
             dispatch_async(dispatch_get_main_queue(), validateLocation);
@@ -472,7 +476,7 @@ planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))
                 {
                     //            dispatch_source_merge_data(self->_block_queue_event, 1);
                     NSDictionary<NSNumber *, NSDate *> *outgoingTwilightDates = solarCycleDataProvider(solarCycleDataProviderDate([[incomingTwilightDates objectForKey:@(TwilightDateSunset)] dateByAddingTimeInterval:AVERAGE_SECONDS_PER_DAY]), solarCycleDataProviderLocation(PlanetaryHourDataSource.data.locationManager.location), dateFromJulianDayNumber);
-                    NSLog(@"DATE\t-----\t%@", [incomingTwilightDates objectForKey:@(TwilightDateSunset)]);
+//                    NSLog(@"DATE\t-----\t%@", [incomingTwilightDates objectForKey:@(TwilightDateSunset)]);
                     
                     NSMutableArray<NSDate *> *allDates = [NSMutableArray arrayWithArray:[outgoingTwilightDates allValues]];
                     [allDates addObjectsFromArray:[incomingTwilightDates allValues]];
