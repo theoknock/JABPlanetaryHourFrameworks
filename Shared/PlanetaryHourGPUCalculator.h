@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nonnull PlanetaryHourGPUCalculator *)calculation;
 
-@property (weak, nonatomic) id<PlanetaryHourDataSourceLogDelegate> planetaryHourDataSourceDelegate;
+//@property (weak, nonatomic) id<PlanetaryHourDataSourceLogDelegate> planetaryHourDataSourceDelegate;
 
 
 @end

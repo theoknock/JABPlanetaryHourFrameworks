@@ -444,6 +444,8 @@ planetaryHoursCompletionBlock:(void(^ _Nullable)(NSArray<NSDictionary<NSNumber *
 planetaryHoursCalculationsCompletionBlock:(void(^ _Nullable)(NSArray<NSArray<NSDictionary<NSNumber *, id> *> *> * _Nullable planetaryHoursArrays))planetaryHoursCalculationsCompletionBlock
 planetaryHourDataSourceCompletionBlock:(void (^ _Nullable)(NSError * _Nullable))planetaryHourDataSourceCompletionBlock
 {
+    
+//    [PlanetaryHourGPUCalculator calculation];
     //    typedef void (^ExecutionTimeMeasurement)(CMTime elapsedTime);
     //    typedef void(^MeasureExecutionTime)(ExecutionTimeMeasurement executionTime);
     //    void(^measureExecutionTime)(CMTime, ExecutionTimeMeasurement) = ^(CMTime start, ExecutionTimeMeasurement executionTime)
